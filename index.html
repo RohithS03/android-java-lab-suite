@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android Application Development — Java Laboratory Suite</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand-container">
+      <div class="brand-icon"><i class="fab fa-android"></i></div>
+      <div>
+        <div class="brand-title">Android Application Development — Java Laboratory Suite</div>
+        <div class="brand-subtitle">Pure Java Implementation (No Kotlin) & Interactive Mobile Device Simulator</div>
+      </div>
+    </div>
+    <div class="header-badges">
+      <span class="badge badge-green"><i class="fas fa-check-circle"></i> Pure Java 17</span>
+      <span class="badge badge-cyan"><i class="fas fa-database"></i> SQLite Storage</span>
+      <span class="badge badge-green"><i class="fas fa-cubes"></i> Material Components</span>
+    </div>
+  </header>
+
+  <!-- Studio Split Container -->
+  <div class="studio-split-container">
+
+    <!-- Left: Phone Device Simulator -->
+    <div class="phone-device-shell">
+      <div class="phone-notch"></div>
+      <div class="phone-status-bar">
+        <span>09:41</span>
+        <div><i class="fas fa-wifi"></i> <i class="fas fa-battery-full"></i></div>
+      </div>
+
+      <div class="phone-screen-viewport">
+        <!-- App Bar -->
+        <div class="phone-app-bar">
+          <div class="phone-app-bar-title">Smart Task Manager</div>
+          <button class="btn" style="padding:0.25rem 0.5rem; background:var(--android-green); color:#000; font-size:0.75rem" onclick="handleOpenAddForm()">
+            <i class="fas fa-plus"></i> Add
+          </button>
+        </div>
+
+        <!-- Phone Content Screens -->
+        <div style="flex:1; padding:1rem; overflow-y:auto">
+          <!-- Screen 1: Task List -->
+          <div id="screen-tasks" class="phone-screen-pane">
+            <div id="taskListContainer"></div>
+          </div>
+
+          <!-- Screen 2: Task Form -->
+          <div id="screen-form" class="phone-screen-pane" style="display:none">
+            <h4 style="color:#fff; margin-bottom:0.75rem">New Task (FormActivity)</h4>
+            <form onsubmit="handleSaveTaskForm(event)">
+              <input type="text" id="formTitleInput" class="form-control" placeholder="Task Title *" required style="width:100%; margin-bottom:0.5rem" />
+              <textarea id="formDescInput" class="form-control" placeholder="Description" style="width:100%; height:60px; margin-bottom:0.5rem"></textarea>
+              <select id="formCategoryInput" class="form-control" style="width:100%; margin-bottom:0.5rem">
+                <option value="Education">Education</option>
+                <option value="Code">Code</option>
+                <option value="General">General</option>
+              </select>
+              <input type="date" id="formDateInput" class="form-control" value="2026-08-15" style="width:100%; margin-bottom:0.5rem" />
+              <select id="formPriorityInput" class="form-control" style="width:100%; margin-bottom:0.75rem">
+                <option value="HIGH">HIGH Priority</option>
+                <option value="MEDIUM" selected>MEDIUM Priority</option>
+                <option value="LOW">LOW Priority</option>
+              </select>
+              <button type="submit" class="btn btn-android" style="width:100%">Save Task to SQLite DB</button>
+            </form>
+          </div>
+
+          <!-- Screen 3: Analytics -->
+          <div id="screen-analytics" class="phone-screen-pane" style="display:none">
+            <div id="analyticsViewContainer"></div>
+          </div>
+
+          <!-- Screen 4: Settings -->
+          <div id="screen-settings" class="phone-screen-pane" style="display:none">
+            <div id="settingsViewContainer"></div>
+          </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="phone-bottom-nav">
+          <div class="nav-tab-btn active" data-screen="screen-tasks">
+            <i class="fas fa-list-check"></i> <span>Tasks</span>
+          </div>
+          <div class="nav-tab-btn" data-screen="screen-analytics">
+            <i class="fas fa-chart-pie"></i> <span>Analytics</span>
+          </div>
+          <div class="nav-tab-btn" data-screen="screen-settings">
+            <i class="fas fa-cog"></i> <span>Settings</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Studio Inspector Panel -->
+    <div class="inspector-panel">
+      <div class="inspector-nav">
+        <button class="inspector-nav-btn active" data-pane="pane-lifecycle">Lifecycle Tracer</button>
+        <button class="inspector-nav-btn" data-pane="pane-db">SQLite DB Inspector</button>
+        <button class="inspector-nav-btn" data-pane="pane-matrix">Coverage Matrix</button>
+        <button class="inspector-nav-btn" data-pane="pane-tests">Testing Suite (17/17)</button>
+        <button class="inspector-nav-btn" data-pane="pane-docs">Documentation & Setup</button>
+      </div>
+
+      <!-- Pane 1: Lifecycle Tracer -->
+      <div id="pane-lifecycle" class="inspector-card-pane">
+        <div class="panel-card">
+          <h3 style="margin-bottom:0.75rem; color:var(--android-green)"><i class="fas fa-history"></i> Real-Time Activity Lifecycle Callback Log</h3>
+          <pre id="lifecycleLogsBox" class="code-snippet" style="height:320px; overflow:auto"></pre>
+        </div>
+      </div>
+
+      <!-- Pane 2: SQLite DB Inspector -->
+      <div id="pane-db" class="inspector-card-pane" style="display:none">
+        <div class="panel-card">
+          <h3 style="margin-bottom:0.75rem; color:var(--android-green)"><i class="fas fa-database"></i> SQLite Database Table Inspector (tasks_lab.db)</h3>
+          <div style="overflow-x:auto">
+            <table class="custom-table">
+              <thead>
+                <tr><th>_id</th><th>title</th><th>category</th><th>due_date</th><th>is_completed</th></tr>
+              </thead>
+              <tbody id="dbInspectorBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pane 3: Coverage Matrix -->
+      <div id="pane-matrix" class="inspector-card-pane" style="display:none">
+        <div class="panel-card">
+          <h3 style="margin-bottom:0.75rem; color:var(--android-green)"><i class="fas fa-table"></i> Android Syllabus Concept Coverage Matrix</h3>
+          <div id="coverageMatrixContainer"></div>
+        </div>
+      </div>
+
+      <!-- Pane 4: Testing Suite -->
+      <div id="pane-tests" class="inspector-card-pane" style="display:none">
+        <div class="panel-card">
+          <h3 style="margin-bottom:0.75rem; color:var(--android-green)"><i class="fas fa-check-double"></i> Automated Android Unit Test Suite</h3>
+          <div id="testBadgesContainer" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:0.75rem"></div>
+        </div>
+      </div>
+
+      <!-- Pane 5: Documentation -->
+      <div id="pane-docs" class="inspector-card-pane" style="display:none">
+        <div class="panel-card">
+          <h3 style="margin-bottom:0.75rem; color:var(--android-green)"><i class="fas fa-book"></i> Android Gradle Project Setup & Architecture</h3>
+          <div class="code-snippet">
+Android Studio Gradle Project Build:
+  - Language: Java (No Kotlin)
+  - JDK Target: Java 17
+  - Android SDK: Compile SDK 34, Min SDK 24
+  - Build System: Gradle 8.2.2
+
+Command to run automated tests via JDK 21:
+  $javac = "...\javac.exe"
+  $java  = "...\java.exe"
+  & $javac -d bin (Get-ChildItem -Recurse -Filter *.java app/src | Select-Object -ExpandProperty FullName)
+  & $java -cp bin com.mobile.lab.AndroidLabTestRunner
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/android_engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
